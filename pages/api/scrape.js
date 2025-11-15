@@ -1,110 +1,3 @@
-// // pages/api/scrape.js
-// import { spawn } from 'child_process';
-// import path from 'path';
-
-// let runningProcess = null;
-// let logs = [];
-
-// export default async function handler(req, res) {
-// 	// 🚀 Start scraper
-// 	if (req.method === 'POST') {
-// 		if (runningProcess) {
-// 			return res.status(409).json({ error: 'Scraper already running' });
-// 		}
-
-// 		const jsonPayload = req.body; // complete JSON from frontend
-// 		const repeatCount = jsonPayload.repeatCount || 1;
-
-// 		const scriptPath = path.join(process.cwd(), 'scraper', 'nmk.py');
-
-// 		console.log('🎯 Launching Python:', scriptPath);
-// 		logs = [];
-
-// 		// 🟢 Immediately push "starting" status log for frontend loader
-// 		logs.push({ type: 'status', message: 'Starting scraper...' });
-
-// 		let currentRun = 0;
-
-// 		// Function to run scraper iteration
-// 		const runScraper = () => {
-// 			if (currentRun >= repeatCount) {
-// 				// All iterations done
-// 				logs.push({
-// 					type: 'done',
-// 					message: `✅ All ${repeatCount} iterations completed.`,
-// 					exitCode: 0,
-// 				});
-// 				runningProcess = null;
-// 				return;
-// 			}
-
-// 			currentRun++;
-// 			logs.push({
-// 				type: 'status',
-// 				message: `🔁 Starting iteration ${currentRun}`,
-// 			});
-
-// 			runningProcess = spawn('python3', [scriptPath]);
-
-// 			// Pass JSON payload for this iteration
-// 			runningProcess.stdin.write(JSON.stringify(jsonPayload));
-// 			runningProcess.stdin.end();
-
-// 			runningProcess.stdout.on('data', (data) => {
-// 				const msg = data.toString().trim();
-// 				console.log('[PYTHON STDOUT]:', msg);
-// 				logs.push({ type: 'log', message: msg });
-// 			});
-
-// 			runningProcess.stderr.on('data', (data) => {
-// 				const msg = data.toString().trim();
-// 				console.error('[PYTHON STDERR]:', msg);
-// 				logs.push({ type: 'error', message: msg });
-// 			});
-
-// 			runningProcess.on('close', (code) => {
-// 				logs.push({
-// 					type: 'status',
-// 					message: `Iteration ${currentRun} finished (exit code: ${code})`,
-// 				});
-// 				runScraper(); // Start next iteration
-// 			});
-// 		};
-
-// 		runScraper();
-// 		return res
-// 			.status(200)
-// 			.json({ message: `Scraper started for ${repeatCount} iterations` });
-// 	}
-
-// 	// 🧩 Stream live logs (SSE)
-// 	if (req.method === 'GET') {
-// 		res.writeHead(200, {
-// 			'Content-Type': 'text/event-stream',
-// 			'Cache-Control': 'no-cache, no-transform',
-// 			Connection: 'keep-alive',
-// 		});
-
-// 		let lastIndex = 0;
-
-// 		const interval = setInterval(() => {
-// 			while (lastIndex < logs.length) {
-// 				const log = logs[lastIndex];
-// 				res.write(`data: ${JSON.stringify(log)}\n\n`);
-// 				lastIndex++;
-// 			}
-// 		}, 500);
-
-// 		req.on('close', () => {
-// 			clearInterval(interval);
-// 			res.end();
-// 		});
-// 		return;
-// 	}
-
-// 	// ❌ Invalid method
-// 	res.status(405).json({ error: 'Method Not Allowed' });
-// }
 import { spawn } from 'child_process';
 import path from 'path';
 
@@ -133,7 +26,7 @@ export default async function handler(req, res) {
 			path.join(process.cwd(), 'scraper', 'creazion.py'),
 			path.join(process.cwd(), 'scraper', 'submit_form.py'),
 			path.join(process.cwd(), 'scraper', 'guestpost_headless.py'),
-			path.join(process.cwd(), 'scraper', 'kphotography.py'), // include only if file exists
+			// path.join(process.cwd(), 'scraper', 'kphotography.py'), // include only if file exists
 
 			// path.join(process.cwd(), 'scraper', 'lebanon.py'), // include only if file exists
 			// path.join(process.cwd(), 'scraper', 'thefollowing.py'), // include only if file exists
