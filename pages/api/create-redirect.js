@@ -40,7 +40,7 @@ Redirecting to <a href="${targetUrl}">${targetUrl}</a>
 
 		fs.writeFileSync(filePath, html);
 
-		const redirectUrl = `https://travelcation.com/redirects/${filename}`;
+		const redirectUrl = `https://travelcation.org/redirects/${filename}`;
 
 		// -------- Update Sitemap ----------
 		const sitemapPath = path.join(process.cwd(), 'public', 'sitemap.xml');
@@ -60,7 +60,7 @@ Redirecting to <a href="${targetUrl}">${targetUrl}</a>
 
 		// -------- Ping Google -------------
 		const sitemapPing = encodeURIComponent(
-			'https://travelcation.com/sitemap.xml'
+			'https://travelcation.org/sitemap.xml'
 		);
 		https.get(`https://www.google.com/ping?sitemap=${sitemapPing}`, () => {
 			console.log('📡 Google pinged');
