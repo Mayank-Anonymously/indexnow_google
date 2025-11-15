@@ -1,0 +1,140 @@
+import sys
+import json
+import time
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    TimeoutException,
+    NoSuchElementException,
+    WebDriverException,
+)
+
+USERNAME = "laylawoods270@gmail.com"
+PASSWORD = "Mannuk@12"
+LOGIN_URL = "https://lebanonhub.app/signin"
+HOME_URL = "https://lebanonhub.app/"
+
+def log(msg):
+    print(msg, flush=True)
+
+def remove_overlays(driver):
+    driver.execute_script("""
+        document.querySelectorAll("[style*='z-index: 2147483647']").forEach(el => el.remove());
+    """)
+
+def safe_click(driver, element):
+    """Try JS-based click with retries."""
+    for attempt in range(3):
+        try:
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+            time.sleep(0.5)
+            driver.execute_script("arguments[0].click();", element)
+            return True
+        except (ElementClickInterceptedException, WebDriverException):
+            log(f"⚠️ Click failed (attempt {attempt+1}), retrying...")
+            remove_overlays(driver)
+            time.sleep(1)
+    return False
+
+def wait_for_publisher(driver, wait, max_scrolls=10):
+    """Scroll and retry until publisher-message is visible."""
+    for i in range(max_scrolls):
+        try:
+            elem = driver.find_element(By.CSS_SELECTOR, "div.publisher-message")
+            if elem.is_displayed():
+                return elem
+        except NoSuchElementException:
+            pass
+        driver.execute_script("window.scrollBy(0, 400);")
+        log(f"🔎 Scrolling attempt {i+1} to locate publisher box...")
+        time.sleep(1)
+    raise TimeoutException("Publisher div not found after scrolling.")
+
+def main():
+    raw = sys.stdin.read().strip()
+    if not raw:
+        raw = '{"message": "Hello LebanonHub 👋"}'
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        data = {"message": "Automation test 🚀"}
+
+    message = data.get("message", "Automation test 🚀")
+
+    chrome_options = Options()
+    chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--disable-notifications")
+    chrome_options.add_argument("--disable-popup-blocking")
+    chrome_options.add_argument("--headless=new")
+    
+
+    driver = webdriver.Chrome(options=chrome_options)
+    wait = WebDriverWait(driver, 30)
+
+    try:
+        # --- LOGIN ---
+        log("🌐 Opening login page...")
+        driver.get(LOGIN_URL)
+        wait.until(EC.presence_of_element_located((By.NAME, "username_email"))).send_keys(USERNAME)
+        driver.find_element(By.NAME, "password").send_keys(PASSWORD)
+
+        login_btn = wait.until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.btn.btn-lg.btn-primary"))
+        )
+        safe_click(driver, login_btn)
+        log("🚀 Login submitted...")
+        time.sleep(5)
+
+        # --- HOME PAGE ---
+        driver.get(HOME_URL)
+        log("🏠 Navigated to home page, waiting for feed...")
+        time.sleep(6)
+        remove_overlays(driver)
+
+        # --- WAIT FOR PUBLISHER BOX ---
+        publisher_div = wait_for_publisher(driver, wait)
+        log("✅ Publisher message box found!")
+
+        safe_click(driver, publisher_div)
+        log("🖱️ Clicked inside publisher box.")
+        time.sleep(2)
+
+        # --- WAIT FOR TEXTAREA ---
+        textarea = WebDriverWait(driver, 20).until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, "textarea.js_publisher-scraper")
+            )
+        )
+        driver.execute_script("arguments[0].focus();", textarea)
+        driver.execute_script("arguments[0].value = arguments[1];", textarea, message)
+        textarea.send_keys(" ")  # trigger input event
+        log(f"✍️ Typed message: {message}")
+
+        # --- WAIT FOR POST BUTTON ---
+        post_btn = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button.js_publisher-btn.js_publisher"))
+        )
+        safe_click(driver, post_btn)
+        log("🚀 Clicked 'Post' button.")
+
+        time.sleep(4)
+        log("✅ Post created successfully!")
+
+    except TimeoutException as e:
+        log(f"⏱️ Timeout error: {e}")
+        driver.save_screenshot("timeout_debug.png")
+        log("📸 Saved screenshot as timeout_debug.png for inspection.")
+    except Exception as e:
+        log(f"❌ Fatal error: {e}")
+    finally:
+        driver.quit()
+        log("🟢 Browser closed.")
+
+if __name__ == "__main__":
+    main()
