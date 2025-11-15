@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 		}
 
 		// Ensure redirects folder exists
-		const redirectDir = path.join(process.cwd(), 'public', 'redirects');
+		const redirectDir = path.join(process.cwd(), 'pages', 'redirects');
 		fs.mkdirSync(redirectDir, { recursive: true });
 
 		// Create unique file name
