@@ -1,1 +1,4 @@
-Google
+User-agent: *
+Allow: /
+
+Sitemap: https://www.travelcation.org/sitemap.xml
