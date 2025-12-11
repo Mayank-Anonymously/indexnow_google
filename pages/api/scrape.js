@@ -27,7 +27,6 @@ export default async function handler(req, res) {
 			path.join(process.cwd(), 'scraper', 'submit_form.py'),
 			path.join(process.cwd(), 'scraper', 'guestpost_headless.py'),
 			// path.join(process.cwd(), 'scraper', 'kphotography.py'), // include only if file exists
-
 			// path.join(process.cwd(), 'scraper', 'lebanon.py'), // include only if file exists
 			// path.join(process.cwd(), 'scraper', 'thefollowing.py'), // include only if file exists
 			// path.join(process.cwd(), 'scraper', 'abhira.py'), // include only if file exists
@@ -46,6 +45,7 @@ export default async function handler(req, res) {
 		});
 
 		logs = [];
+		
 		logs.push({ type: 'status', message: 'Starting scraper batch...' });
 
 		let iteration = 0;

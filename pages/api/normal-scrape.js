@@ -24,7 +24,9 @@ export default async function handler(req, res) {
 			'letsdobookmark.py',
 			'star_bookmarking.py',
 			'ubookmarking.py',
-			// 'rbookmarking.py',
+			'rbookmarking.py',
+			'abookmarking.py',
+			'sbookmarking.py',
 		];
 
 		const scriptPaths = scripts

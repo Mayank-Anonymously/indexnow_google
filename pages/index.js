@@ -74,7 +74,9 @@ export default function Home() {
 	return (
 		<div style={{ padding: 20, fontFamily: 'monospace' }}>
 			<h1>🕷️ Multi-Guestbook Scraper</h1>
-
+			<a href='https://estudios.itam.mx/sites/default/files/webform/united_airlines_guia.pdf'>
+				https://estudios.itam.mx/sites/default/files/webform/united_airlines_guia.pdf
+			</a>
 			<div
 				style={{
 					display: 'flex',

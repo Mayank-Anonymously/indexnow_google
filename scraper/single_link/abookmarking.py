@@ -12,8 +12,8 @@ from selenium.common.exceptions import NoSuchElementException
 # ==========================================
 # 🔹 CONFIG
 # ==========================================
-LOGIN_URL = "https://www.letsdobookmark.com/login/re-submit"
-SUBMIT_URL = "https://www.letsdobookmark.com/submit"
+LOGIN_URL = "https://www.abookmarking.com/login/re-submit"
+SUBMIT_URL = "https://www.abookmarking.com/submit"
 
 USERNAME = "nalybuxa@forexzig.com"
 PASSWORD = "Mannuk@12"
